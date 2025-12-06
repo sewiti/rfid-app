@@ -93,6 +93,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer d.Close()
 
 	if !silent {
 		if err := d.ChangeLed(rfid.LedOff); err != nil {

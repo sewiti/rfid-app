@@ -34,6 +34,10 @@ func OpenDevice(dev string, commsDebug bool) (*Device, error) {
 	}, nil
 }
 
+func (d *Device) Close() error {
+	return d.port.Close()
+}
+
 // Info reads device model information.
 func (d *Device) Info() (string, error) {
 	status, answer, err := d.RawCommand(CommandInfo, nil)
@@ -117,5 +121,4 @@ func (d *Device) RawCommand(cmd Command, data []byte) (status byte, answer []byt
 	}
 
 	return resp[6], resp[7 : len(resp)-1], nil
-
 }
