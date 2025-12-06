@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/fln/rfid-app/rfid"
+	"github.com/sewiti/rfid-app/rfid"
 )
 
 var silent bool

@@ -14,7 +14,7 @@ All device comminucation logic is moved to a separate golang package `rfid`.
 This library can be used to create custom applications supporting this
 particular RFID read/writer device.
 
-[![Documentation](https://godoc.org/github.com/fln/rfid-app/rfid?status.svg)](https://godoc.org/github.com/fln/rfid-app/rfid)
+[![Documentation](https://godoc.org/github.com/sewiti/rfid-app/rfid?status.svg)](https://godoc.org/github.com/sewiti/rfid-app/rfid)
 
 App usage examples
 ------------------
