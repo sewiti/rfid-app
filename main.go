@@ -2,9 +2,10 @@ package main
 
 import (
 	"bytes"
-	"encoding/hex"
+	"encoding/binary"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -59,7 +60,7 @@ func readMode(d *rfid.Device) {
 		emitError(d)
 		log.Fatal(err)
 	}
-	fmt.Println(hex.EncodeToString(id))
+	fprintID(os.Stdout, id)
 	emitOK(d)
 }
 
@@ -74,9 +75,26 @@ func readLoopMode(d *rfid.Device) {
 		if bytes.Equal(id, lastID) {
 			continue
 		}
-		fmt.Println(hex.EncodeToString(id))
+		if lastID != nil {
+			fmt.Println()
+		}
+		fprintID(os.Stdout, id)
 		emitOK(d)
 		lastID = id
+	}
+}
+
+func fprintID(w io.Writer, id []byte) {
+	fmt.Fprintf(w, "hex      : %x\n", id)
+	if len(id) == 5 {
+		id40 := make([]byte, 8)
+		id24 := make([]byte, 4)
+		copy(id40[3:], id)
+		copy(id24[1:], id[2:])
+		fmt.Fprintf(w, "dec(40)  : %013d\n", binary.BigEndian.Uint64(id40))
+		fmt.Fprintf(w, "dec(32)  : %010d\n", binary.BigEndian.Uint32(id[1:]))
+		fmt.Fprintf(w, "dec(24)  : %08d\n", binary.BigEndian.Uint32(id24))
+		fmt.Fprintf(w, "dec(8+16): %03d,%05d\n", id[2], binary.BigEndian.Uint16(id[3:]))
 	}
 }
 
