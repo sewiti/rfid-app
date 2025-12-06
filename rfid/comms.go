@@ -12,7 +12,7 @@ import (
 // commands in raw mode, with RawCommand() method.
 const (
 	StatusOK    byte = 0x00
-	StatusNoTag      = 0x01
+	StatusNoTag byte = 0x01
 )
 
 // Command is an enum type for encoding different commands that can be sent to
@@ -22,11 +22,11 @@ type Command uint16
 // List of supported commands.
 const (
 	CommandInfo   Command = 0x0102
-	CommandBeep           = 0x0103
-	CommandLed            = 0x0104
-	CommandRead           = 0x010C
-	CommandWrite2         = 0x020C
-	CommandWrite3         = 0x030C
+	CommandBeep   Command = 0x0103
+	CommandLed    Command = 0x0104
+	CommandRead   Command = 0x010C
+	CommandWrite2 Command = 0x020C
+	CommandWrite3 Command = 0x030C
 )
 
 // LedMode encodes device led status - off, red or green.
@@ -35,8 +35,8 @@ type LedMode byte
 // List of LED modes accepted by LED change command.
 const (
 	LedOff   LedMode = 0x00
-	LedRed           = 0x01
-	LedGreen         = 0x02
+	LedRed   LedMode = 0x01
+	LedGreen LedMode = 0x02
 )
 
 // beepUnit is a minimum beep duration supported by this device. When sending
