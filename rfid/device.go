@@ -1,6 +1,7 @@
 package rfid
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"time"
@@ -99,6 +100,42 @@ func (d *Device) ReadTag() ([]byte, error) {
 	default:
 		return nil, fmt.Errorf("rfid: received unexpected status %d, answer %v", status, answer)
 	}
+}
+
+func (d *Device) WriteTag(payload []byte) error {
+	if len(payload) != 5 {
+		return fmt.Errorf("rfid: payload must be 5 bytes")
+	}
+	if _, err := d.ReadTag(); err != nil { // ensure tag exists
+		return err
+	}
+
+	data := make([]byte, 6)
+	data[0] = 0x00 // 0x01 locks it
+	copy(data[1:], payload)
+
+	writeCommands := []Command{
+		CommandWrite2,
+		CommandWrite3,
+	}
+	for _, writeCmd := range writeCommands {
+		status, answer, err := d.RawCommand(writeCmd, data)
+		if err != nil {
+			return err
+		}
+		if status != StatusOK {
+			return fmt.Errorf("rfid: received unexpected status %d, answer %v", status, answer)
+		}
+
+		id, err := d.ReadTag()
+		if err != nil {
+			return err
+		}
+		if bytes.Equal(id, payload) {
+			return nil
+		}
+	}
+	return errors.New("rfid: write failed")
 }
 
 // RawCommand is a lower-level interface allowing to send custom commands to the

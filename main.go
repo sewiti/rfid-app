@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"io"
@@ -46,6 +47,15 @@ func readOnce(d *rfid.Device) (id []byte, err error) {
 	return id, err
 }
 
+func writeOnce(d *rfid.Device, id []byte) (err error) {
+	for {
+		err = d.WriteTag(id)
+		if err != rfid.ErrNoTag {
+			return err
+		}
+	}
+}
+
 func infoMode(d *rfid.Device) {
 	model, err := d.Info()
 	if err != nil {
@@ -84,6 +94,18 @@ func readLoopMode(d *rfid.Device) {
 	}
 }
 
+func writeMode(d *rfid.Device, payload []byte) {
+	err := writeOnce(d, payload)
+	if err != nil {
+		emitError(d)
+		log.Fatal(err)
+	}
+	fmt.Println("write successful")
+	emitOK(d)
+	time.Sleep(50 * time.Millisecond)
+	emitOK(d)
+}
+
 func fprintID(w io.Writer, id []byte) {
 	fmt.Fprintf(w, "hex      : %x\n", id)
 	if len(id) == 5 {
@@ -101,10 +123,16 @@ func fprintID(w io.Writer, id []byte) {
 func main() {
 	var dev string
 	var mode string
+	var payload []byte
 
 	flag.StringVar(&dev, "dev", "/dev/ttyUSB0", "RFID read/writer serial interface device")
-	flag.StringVar(&mode, "mode", "read", "Application mode, one of: read, read-loop, info")
+	flag.StringVar(&mode, "mode", "read", "Application mode, one of: read, read-loop, write, info")
 	flag.BoolVar(&silent, "silent", false, "Skip beeps and LED flashes, reduces number of commands sent to the reader")
+	flag.Func("payload", "Hex payload to write", func(s string) error {
+		var err error
+		payload, err = hex.DecodeString(s)
+		return err
+	})
 	flag.Parse()
 
 	d, err := rfid.OpenDevice(dev, false)
@@ -126,6 +154,8 @@ func main() {
 		readMode(d)
 	case "read-loop":
 		readLoopMode(d)
+	case "write":
+		writeMode(d, payload)
 	default:
 		flag.PrintDefaults()
 		os.Exit(2)
