@@ -23,15 +23,35 @@ Read a single card/tag, application will wait until tag is detected:
 
 ```sh
 $ ./rfid-app 
-00000013ec
+hex      : 00000013ec
+dec(40)  : 0000000005100
+dec(32)  : 0000005100
+dec(24)  : 00005100
+dec(8+16): 000,05100
 ```
 
 Reading multiple tags in a loop:
 
 ```sh
 $ ./rfid-app --mode read-loop
-00000013ec
-00000013ed
+hex      : 00000013ec
+dec(40)  : 0000000005100
+dec(32)  : 0000005100
+dec(24)  : 00005100
+dec(8+16): 000,05100
+
+hex      : 00000013ed
+dec(40)  : 0000000005101
+dec(32)  : 0000005101
+dec(24)  : 00005101
+dec(8+16): 000,05101
+```
+
+Write data to card/tag, application will wait until tag is detected:
+
+```sh
+$ ./rfid-app --mode write --payload 00000013ec
+write successful
 ```
 
 Checking device model info:
